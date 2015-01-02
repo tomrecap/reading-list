@@ -3,3 +3,8 @@
 .header {
   margin-top: 80px;
 }
+
+button.active {
+  background: #bbb;
+  color: white;
+}

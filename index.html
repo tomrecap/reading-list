@@ -24,7 +24,10 @@
         </div>
       
         <div class="six columns">
-          <button ng-click="unread()">
+          <button ng-click="showAll()" ng-class="{'active': viewState == 'all' }">
+            All
+          </button>
+          <button ng-click="showBooksToCheckOut()" ng-class="{'active': viewState == 'possibleReads' }">
             Unread
           </button>
           <button ng-click="getBooks()">
@@ -57,13 +60,13 @@
       <tbody>
         <tr ng-repeat="book in books">          
           <td>
-            {{ book.title }}
+            {{ title(book) }}
           </td>
           <td>
-            {{ book.authorfirst }}
+            {{ authorFirstName(book) }}
           </td>
           <td>
-            {{ book.authorlast }}
+            {{ authorLastName(book) }}
           </td>
           <td>
             <button>
@@ -76,7 +79,7 @@
             </button>
           </td>
           <td>
-            {{ book.dateadded }}
+            {{ dateAdded(book) }}
           </td>
         </tr>
       </tbody>

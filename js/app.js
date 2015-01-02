@@ -10,16 +10,24 @@ angular.module('readingListApp', [])
       
       var allBooks = [];
       $scope.books = [];
+      $scope.viewState = '';
       
       $scope.getBooks = getBooks;
-      $scope.showUnread = showUnread;
+      $scope.showAll = showAll;
+      $scope.showBooksToCheckOut = showBooksToCheckOut;
+      
+      $scope.title = title;
+      $scope.authorFirstName = authorFirstName;
+      $scope.authorLastName = authorLastName;
+      $scope.dateAdded = dateAdded;
+      
       
       initialize();
       
       ///////////
       
       function initialize() {
-        getBooks().then(showUnread);
+        getBooks().then(showBooksToCheckOut);
       };
       
       function getBooks() {
@@ -29,15 +37,10 @@ angular.module('readingListApp', [])
           params: { alt: 'json'}
         }).then(function (response) {
           console.log('got a response from google API');
-          var booksData = response.data.feed.entry;
+          allBooks = response.data.feed.entry;
           
           console.log('all the data: ');
-          console.log(booksData);
-          
-          var useableBooks = _.map(booksData, parseBookData);
-          
-          console.log('useableBooks: ', useableBooks);
-          allBooks = _.compact(useableBooks);
+          console.log(allBooks);
         })
       };
       
@@ -49,24 +52,90 @@ angular.module('readingListApp', [])
           console.log('googleBookObject has no content. returning false.')
           return false;
         }
-        
+
         var bookObject = {}
 
         bookObject.title = googleBookObject.title.$t || '';
-        
+        if (bookObject.title.substr(0,4) == 'Row:') {
+          bookObject.title = '';
+        }
+
         _.each(detailsString.split(', '), function (pair) {
           var pieces = pair.split(': ');
           bookObject[pieces[0]] = pieces[1];
         });
-        
+
+        bookObject.url = googleBookObject.id.$t;
+
         console.log('returning usable book object: ', bookObject);
         return bookObject;
       };
       
-      function showUnread() {
-        $scope.books = _.filter(allBooks, function (book) {
-          return !book.read || !book.skip;
+      function objectFromString(string) {
+        var object = {};
+        _.each(string.split(', '), function (pair) {
+          var pieces = pair.split(': ');
+          object[pieces[0]] = pieces[1];
         });
+        return object;
       }
+      
+      
+      
+      function title(book) {
+        var title = book.title.$t || '';
+        if (title.substr(0,4) == 'Row:') {
+          title = '';
+        }
+        return title;
+      }
+
+      function authorFirstName(book) {
+        return objectFromString(book.content.$t).authorfirst || '';
+      }
+
+      function authorLastName(book) {
+        return objectFromString(book.content.$t).authorlast || '';
+      }
+
+      function dateAdded(book) {
+        return objectFromString(book.content.$t).dateadded || '';
+      }
+      
+      function isAlreadyRead(book) {
+        return !!parseInt(objectFromString(book.content.$t).read || 0);
+      }
+
+      function isAlreadyTried(book) {
+        return !!parseInt(objectFromString(book.content.$t).skip || 0);
+      }
+      
+      function isAPossibleRead(book) {
+        return !(isAlreadyRead(book) || isAlreadyTried(book));
+      }
+      
+      
+      function showAll() {
+        $scope.books = allBooks;
+        $scope.viewState = 'all';
+      }
+
+      function showBooksToCheckOut() {
+        $scope.books = _.filter(allBooks, isAPossibleRead);
+        $scope.viewState = 'possibleReads';
+      }
+      
+      function showAlreadyRead() {
+        $scope.books = _.filter(allBooks, isAlreadyRead);
+      }
+
+      function showAlreadyTried() {
+        $scope.books = _.filter(allBooks, isAlreadyTried);
+      }
+
+      
+      function setToRead(book) {
+        
+      };
     }
   ]);
