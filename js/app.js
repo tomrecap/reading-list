@@ -19,21 +19,28 @@ angular.module('readingListApp', [])
       ///////////
       
       function initialize() {
-        getBooks().then(function () {
-          $scope.whichBooksToShow = 'lastTwenty';
-          $scope.sortingProperty = 'author_last';
-        });
+        getBooks();
       };
       
       function getBooks() {
-        var spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1dIssTHJjT3v3iHuQFu6zgH0gcih1T0hGBVxehrV8iJo/pub?gid=983517851&single=true&output=csv';
-        
-        return $http.get(spreadsheetUrl, {
-          params: { alt: 'json'}
-        }).then(function (response) {
-          allBooks = objectsFromCsv(response.data);
-          $scope.books = allBooks;
+        var spreadsheetUrl = 'https://docs.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=1dIssTHJjT3v3iHuQFu6zgH0gcih1T0hGBVxehrV8iJo&output=html';
+
+
+        Tabletop.init({
+          key: spreadsheetUrl,
+          callback: addBooksToPage,
+          simpleSheet: true
         });
+        
+        function addBooksToPage(books, tabletop) {
+          allBooks = books;
+
+          $scope.$apply(function () {
+            $scope.books = allBooks;
+            $scope.whichBooksToShow = 'lastTwenty';
+            $scope.sortingProperty = 'author_last';
+          });
+        }
       };
       
       function objectsFromCsv(csvString) {
