@@ -1,18 +1,64 @@
 /*@import url(http://fonts.googleapis.com/css?family=Raleway:400,600);*/
 
 /*@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300italic,700,300|Open+Sans:300italic,400italic,600italic,700italic,800italic,700,300,600,800,400);*/
+/*@import url(http://fonts.googleapis.com/css?family=Open+Sans:400);*/
 
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:400);
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Serif+Pro:400,800);
 
 body {
-  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  font-family: 'Source Serif Pro', Helvetica, sans-serif;
+  line-height: 1.3;
+  font-size: 14px;
 }
 
 .header {
-  margin-top: 80px;
+  margin-top: 24px;
+  font-family: 'Source Sans Pro', Helvetica, sans-serif;
 }
+
+.page-title {
+  font-size: 30px;
+}
+
+.book {
+  padding: 12px 0px;
+  border-top:1px solid #cdcdcd;
+}
+
+.title:before, .author:before {
+  min-width: 48px;
+  display: inline-block;
+  
+  font-family: "source sans pro";
+  font-size: 10px;
+  font-weight: 700;
+  color: #555;
+  text-transform:uppercase;
+  letter-spacing: 1px;
+}
+
+.title {
+  text-transform: capitalize;
+}
+.title:before {
+  content:'Title:';
+}
+
+.author {
+  text-transform: capitalize;
+  font-weight: 800;
+}
+.author:before {
+  content:'Author:';
+}
+
 
 button.active {
   background: #bbb;
   color: white;
+}
+
+/* Phone view */
+@media (max-width: 640px) {
+
 }

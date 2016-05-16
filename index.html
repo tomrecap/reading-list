@@ -5,6 +5,8 @@
   
   <link rel="stylesheet" href="css/normalize.css" type="text/css">
   <link rel="stylesheet" href="css/skeleton.css" type="text/css">
+  <!-- <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"> -->
+  <!-- <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css"> -->
   <link rel="stylesheet" href="css/styles.css" type="text/css">
   
   <script src="js/lodash.min.js"></script>
@@ -17,77 +19,67 @@
   <div class="container" ng-controller="ReadingListController">
     <section class="header">
       <div class="row">
-        <div class="six columns">      
-          <h2 class="title">
+        <div class="one-half column">
+          <h2 class="page-title">
             Reading List
           </h2>
         </div>
       
-        <div class="six columns">
-          <button ng-click="showAll()" ng-class="{'active': viewState == 'all' }">
-            All
-          </button>
-          <button ng-click="showBooksToCheckOut()" ng-class="{'active': viewState == 'possibleReads' }">
-            Unread
-          </button>
+        <div class="one-half column">
+          
+          <div class="row">
+            <div class="one-half column">
+              <label for="filter-select">Show:</label>
+              <select ng-model="whichBooksToShow" class="u-full-width" id="filter-select">
+                <option value="all">
+                  All Books
+                </option>
+                <option value="unread">
+                  All Unread
+                </option>
+                <option value="lastSixMonths">
+                  Last Six Months
+                </option>
+                <option value="lastTwenty">
+                  Last Twenty Added
+                </option>
+              </select>
+            </div>
+            <div class="one-half column">
+              <label for="sort-by-title">
+                <input type="radio" id="sort-by-title" ng-model="sortingProperty" value="title">
+                <span class="label-body">            
+                  Title
+                </span>
+              </label>
+              <label for="sort-by-author">
+                <input type="radio" id="sort-by-author" ng-model="sortingProperty" value="author_last">
+                <span class="label-body">            
+                  Author
+                </span>
+              </label>
+            </div>
+          </div>
+          
           <button ng-click="getBooks()">
             Refresh
           </button>
-          <a class="button" href="https://docs.google.com/a/jd18.law.harvard.edu/forms/d/1-5WDzJOsmSqwncd_RNYB4iBFVPt6iOuo6k0KPEnb52g/viewform?c=0&w=1">
-            &plus;
+          <a class="button button-primary" target="_blank" href="https://docs.google.com/a/jd18.law.harvard.edu/forms/d/1-5WDzJOsmSqwncd_RNYB4iBFVPt6iOuo6k0KPEnb52g/viewform?c=0&w=1">
+            Add
           </a>
         </div>
       </div>
     </section>
     
-    <table class="u-full-width">
-      <thead>
-        <tr>          
-          <th>
-            Title
-          </th>
-          <th>
-            First
-          </th>
-          <th>
-            Last
-          </th>
-          <th></th>
-          <th></th>
-          <th>
-            Added
-          </th>
-        </tr>
-      </thead>
-      
-      <tbody>
-        <tr ng-repeat="book in books">          
-          <td>
-            {{ title(book) }}
-          </td>
-          <td>
-            {{ authorFirstName(book) }}
-          </td>
-          <td>
-            {{ authorLastName(book) }}
-          </td>
-          <td>
-            <button>
-              Read
-            </button>
-          </td>
-          <td>
-            <button>
-              Tried
-            </button>
-          </td>
-          <td>
-            {{ dateAdded(book) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    
+    <div class="row book" ng-repeat="book in books | orderBy: sortingProperty | filter:filterBooksBy(whichBooksToShow)">
+      <span class="title">
+        {{ book.title || '&mdash;' }}
+      </span>
+      <br>
+      <span class="author">
+        {{ book.author_first || '' }} {{ book.author_last || '&mdash;' }}
+      </span>
+    </div>    
     
   </div>
   
