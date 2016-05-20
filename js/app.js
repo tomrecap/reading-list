@@ -31,8 +31,8 @@ angular.module('readingListApp', [])
       $scope.books = [];
       $scope.booksToShowSliderPosition = 3;
       $scope.sortingProperty = 'author_last';
-      $scope.log = function(input) { console.log(input) };
       var queuedFilterUpdate = false;
+      $scope.fetchInProgress = false;
       
       
       $scope.getBooks = getBooks;
@@ -52,7 +52,7 @@ angular.module('readingListApp', [])
         // var spreadsheetUrl = 'https://docs.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=1dIssTHJjT3v3iHuQFu6zgH0gcih1T0hGBVxehrV8iJo&output=html';
         var spreadsheetKey = '1dIssTHJjT3v3iHuQFu6zgH0gcih1T0hGBVxehrV8iJo'
 
-
+        $scope.fetchInProgress = true;
         Tabletop.init({
           key: spreadsheetKey,
           callback: addBooksToPage,
@@ -60,6 +60,7 @@ angular.module('readingListApp', [])
         });
         
         function addBooksToPage(books, tabletop) {
+          $scope.fetchInProgress = false;
           allBooks = books;
 
           $scope.$apply(function () {
@@ -87,22 +88,14 @@ angular.module('readingListApp', [])
 
 
       function maybeUpdateFilterCriterion() {
-        console.log('maybeUpdateFilterCriterion fired');
-
-        console.log('is there a filter update waiting?', (!!queuedFilterUpdate ? 'yes' : 'no'));
         if (!!queuedFilterUpdate) {
           queuedFilterUpdate.cancel();
-          console.log('queuedFilterUpdate has been canceled')
         }
 
-        console.log('making a new queuedFilterUpdate');
-        var delay = 500;
-        queuedFilterUpdate = _.debounce(updateFilterCriterion, delay)();
-        console.log('update is waiting, will commence in ' + delay + ' ms');
+        queuedFilterUpdate = _.debounce(updateFilterCriterion, 500)();
       };
 
       function updateFilterCriterion() {
-        console.log('ready to update the filter criterion to', $scope.filterSliderValues[$scope.booksToShowSliderPosition]['code'])
         $scope.filterCriterion = $scope.filterSliderValues[$scope.booksToShowSliderPosition]['code'];
         $scope.$apply(function () { true; });
       };
