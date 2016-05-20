@@ -8,10 +8,36 @@ angular.module('readingListApp', [])
     ) {
       window.scope = $scope;
       
+      $scope.filterSliderValues = [
+        {
+          code: 'all',
+          text: 'All Books'
+        },
+        {
+          code: 'unread',
+          text: 'All Unread'
+        },
+        {
+          code: 'lastSixMonths',
+          text: 'Last 6 Mo.'
+        },
+        {
+          code: 'lastTwenty',
+          text: 'Last 20 Added'
+        }
+      ];
+      
       var allBooks = [];
       $scope.books = [];
+      $scope.booksToShowSliderPosition = 3;
+      $scope.sortingProperty = 'author_last';
+      var queuedFilterUpdate = false;
+      $scope.fetchInProgress = false;
+      
       
       $scope.getBooks = getBooks;
+      $scope.updateFilterCriterion = updateFilterCriterion;
+      $scope.maybeUpdateFilterCriterion = maybeUpdateFilterCriterion;
       $scope.filterBooksBy = filterBooksBy;
       
       initialize();
@@ -23,27 +49,28 @@ angular.module('readingListApp', [])
       };
       
       function getBooks() {
-        var spreadsheetUrl = 'https://docs.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=1dIssTHJjT3v3iHuQFu6zgH0gcih1T0hGBVxehrV8iJo&output=html';
+        // var spreadsheetUrl = 'https://docs.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=1dIssTHJjT3v3iHuQFu6zgH0gcih1T0hGBVxehrV8iJo&output=html';
+        var spreadsheetKey = '1dIssTHJjT3v3iHuQFu6zgH0gcih1T0hGBVxehrV8iJo'
 
-
+        $scope.fetchInProgress = true;
         Tabletop.init({
-          key: spreadsheetUrl,
+          key: spreadsheetKey,
           callback: addBooksToPage,
           simpleSheet: true
         });
         
         function addBooksToPage(books, tabletop) {
+          $scope.fetchInProgress = false;
           allBooks = books;
 
           $scope.$apply(function () {
             $scope.books = allBooks;
-            $scope.whichBooksToShow = 'lastTwenty';
-            $scope.sortingProperty = 'author_last';
+            updateFilterCriterion();
           });
         }
       };
       
-      function objectsFromCsv(csvString) {
+      function OBSOLETEobjectsFromCsv(csvString) {
         var objects = csvString.split('\n');
         var keys = objects.shift().split(',');
 
@@ -59,6 +86,19 @@ angular.module('readingListApp', [])
         return objects;
       };
 
+
+      function maybeUpdateFilterCriterion() {
+        if (!!queuedFilterUpdate) {
+          queuedFilterUpdate.cancel();
+        }
+
+        queuedFilterUpdate = _.debounce(updateFilterCriterion, 500)();
+      };
+
+      function updateFilterCriterion() {
+        $scope.filterCriterion = $scope.filterSliderValues[$scope.booksToShowSliderPosition]['code'];
+        $scope.$apply(function () { true; });
+      };
 
       function filterBooksBy(criterion) {
         var booksToShow = allBooks;
@@ -83,7 +123,7 @@ angular.module('readingListApp', [])
         }
         
         return function (book) {
-          return _(booksToShow).map('$$hashKey').contains(book.$$hashKey);
+          return _(booksToShow).map('$$hashKey').includes(book.$$hashKey);
         };
       }
       

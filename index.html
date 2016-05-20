@@ -3,13 +3,16 @@
     Reading List
   </title>
   
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  
   <link rel="stylesheet" href="css/normalize.css" type="text/css">
   <link rel="stylesheet" href="css/skeleton.css" type="text/css">
   <!-- <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"> -->
   <!-- <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css"> -->
   <link rel="stylesheet" href="css/styles.css" type="text/css">
   
-  <script src="js/lodash.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/lodash/4.12.0/lodash.min.js"></script>
   <script src="js/tabletop.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
   <script type="text/javascript" src="js/app.js"></script>
@@ -30,49 +33,36 @@
           
           <div class="row">
             <div class="one-half column">
-              <label for="filter-select">Show:</label>
-              <select ng-model="whichBooksToShow" class="u-full-width" id="filter-select">
-                <option value="all">
-                  All Books
-                </option>
-                <option value="unread">
-                  All Unread
-                </option>
-                <option value="lastSixMonths">
-                  Last Six Months
-                </option>
-                <option value="lastTwenty">
-                  Last Twenty Added
-                </option>
-              </select>
+              <label for="books-to-show-slider" class="slider-label" ng-click="booksToShowSliderPosition = (booksToShowSliderPosition == '0' ? 1 : (booksToShowSliderPosition - 1 || 3)); maybeUpdateFilterCriterion()">Show:</label> {{ filterSliderValues[booksToShowSliderPosition]['text'] }}
+              <input type="range" class="slider-input" ng-model="booksToShowSliderPosition" ng-change="maybeUpdateFilterCriterion()" id="books-to-show-slider" min="0" max="3" step="1">
             </div>
             <div class="one-half column">
-              <label for="sort-by-title">
-                <input type="radio" id="sort-by-title" ng-model="sortingProperty" value="title">
-                <span class="label-body">            
-                  Title
-                </span>
+              <label for="sort-by-title-checkbox" class="switch-label">
+                Author
               </label>
-              <label for="sort-by-author">
-                <input type="radio" id="sort-by-author" ng-model="sortingProperty" value="author_last">
-                <span class="label-body">            
-                  Author
-                </span>
+              
+              <label class="switch">
+                <input type="checkbox" id="sort-by-title-checkbox" ng-model="sortByTitle" ng-change="sortingProperty = (sortByTitle ? 'title' : 'author_last')">
+                <div class="slider round"></div>
+              </label>
+
+              <label for="sort-by-title-checkbox" class="switch-label">
+                Title
               </label>
             </div>
           </div>
           
           <button ng-click="getBooks()">
-            Refresh
+            Refresh<span ng-show="fetchInProgress">ing&hellip;</span>
           </button>
-          <a class="button button-primary" target="_blank" href="https://docs.google.com/a/jd18.law.harvard.edu/forms/d/1-5WDzJOsmSqwncd_RNYB4iBFVPt6iOuo6k0KPEnb52g/viewform?c=0&w=1">
+          <a class="button button-primary u-pull-right" target="_blank" href="https://docs.google.com/a/jd18.law.harvard.edu/forms/d/1-5WDzJOsmSqwncd_RNYB4iBFVPt6iOuo6k0KPEnb52g/viewform?c=0&w=1">
             Add
           </a>
         </div>
       </div>
     </section>
     
-    <div class="row book" ng-repeat="book in books | orderBy: sortingProperty | filter:filterBooksBy(whichBooksToShow)">
+    <div class="row book" ng-repeat="book in books | orderBy: sortingProperty | filter:filterBooksBy(filterCriterion)">
       <span class="title">
         {{ book.title || '&mdash;' }}
       </span>
