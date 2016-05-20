@@ -20,6 +20,13 @@ body {
   font-size: 30px;
 }
 
+.slider-label {
+  display: inline-block;
+}
+.slider-input {
+  display: block;
+}
+
 .book {
   padding: 12px 0px;
   border-top:1px solid #cdcdcd;
