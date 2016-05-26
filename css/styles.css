@@ -27,7 +27,17 @@ body {
   display: block;
   padding: 12px 0;
 }
-
+/*input#books-to-show-slider:before {
+  content:"asdf";
+  display: block;
+  position: relative;
+  width: 33%;
+  left: 33%;
+  height: 6px;
+  border-right: 1px solid gray;
+  border-left: 1px solid gray;
+}
+*/
 
 .switch-label {
   display: inline-block;
