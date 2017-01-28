@@ -59,9 +59,16 @@ angular.module('readingListApp', [])
           simpleSheet: true
         });
         
+        function convertMessyTimestampToDate(book) {
+          book.Timestamp = new Date(book.Timestamp);
+          return book;
+        }
+        
         function addBooksToPage(books, tabletop) {
           $scope.fetchInProgress = false;
           allBooks = books;
+
+          allBooks = _.map(allBooks, convertMessyTimestampToDate);
 
           $scope.$apply(function () {
             $scope.books = allBooks;
@@ -117,7 +124,8 @@ angular.module('readingListApp', [])
         } else if (criterion == 'lastTwenty') {
           booksToShow = _(booksToShow)
             .filter(isAPossibleRead)
-            .sortBy('-Timestamp')
+            .sortBy('Timestamp')
+            .reverse()
             .take(20)
             .value();
         }
