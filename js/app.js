@@ -7,7 +7,7 @@ angular.module('readingListApp', [])
     $scope
     ) {
       window.scope = $scope;
-      var verbose = true;
+      var verbose = false;
       
       $scope.filterSliderValues = [
         {
