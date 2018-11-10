@@ -7,6 +7,7 @@ angular.module('readingListApp', [])
     $scope
     ) {
       window.scope = $scope;
+      var verbose = true;
       
       $scope.filterSliderValues = [
         {
@@ -45,35 +46,87 @@ angular.module('readingListApp', [])
       ///////////
       
       function initialize() {
+        log(" ");
+        log("initialize function has begun. about to call getBooks()");
         getBooks();
+        log("getBooks() should be done. initialization complete.");
+        log(" ");
       };
+
+      function log (argument) {
+        if (verbose) {
+          console.log(argument);
+        }
+      };
+
       
       function getBooks() {
+        log("getBooks() has started.");
         // var spreadsheetUrl = 'https://docs.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=1dIssTHJjT3v3iHuQFu6zgH0gcih1T0hGBVxehrV8iJo&output=html';
-        var spreadsheetKey = '1dIssTHJjT3v3iHuQFu6zgH0gcih1T0hGBVxehrV8iJo'
+        var spreadsheetKey = '1dIssTHJjT3v3iHuQFu6zgH0gcih1T0hGBVxehrV8iJo';
+        log("spreadsheetKey is set to " + spreadsheetKey);
 
         $scope.fetchInProgress = true;
+        log("initializing Tabletop. next you should hear from the callback, addBooksToPage().");
         Tabletop.init({
           key: spreadsheetKey,
           callback: addBooksToPage,
-          simpleSheet: true
+          simpleSheet: true,
+          prettyColumnNames: false
         });
+        log(" ");
+        log("has addBooksToPage() happened yet? if not, then Tabletop’s promise is taking some time to resolve.");
+        log("here’s what allBooks looks like now: ");
+        log(allBooks)
+        log(" ");
         
         function convertMessyTimestampToDate(book) {
-          book.Timestamp = new Date(book.Timestamp);
+          var doubleSuperExtraVerbose = false;
+
+          !doubleSuperExtraVerbose || log(" ");
+          !doubleSuperExtraVerbose || log("now in the convertMessyTimestampToDate function.");
+          !doubleSuperExtraVerbose || log("current book is: ");
+          !doubleSuperExtraVerbose || log(book);
+
+          !doubleSuperExtraVerbose || log("book’s timestamp is: " + book.timestamp);
+          !doubleSuperExtraVerbose || log("a new Date object based on book’s timestamp looks like: ");
+          !doubleSuperExtraVerbose || log(new Date(book.timestamp));
+          
+          !doubleSuperExtraVerbose || log("now let’s update book’s timestamp with a new Date object");
+          
+          book.timestamp = new Date(book.timestamp);
+          
+          !doubleSuperExtraVerbose || log("all done. here is what book looks like now: ");
+          !doubleSuperExtraVerbose || log(book);
+          !doubleSuperExtraVerbose || log(" ");
+
+
           return book;
         }
         
         function addBooksToPage(books, tabletop) {
+          log(" ");
+          log("hello from addBooksToPage()! the fetch should be done.");
           $scope.fetchInProgress = false;
+          log("scope.fetchInProgress is now false.");
+          
+          log("now setting allBooks from the books array (which is local to this function, not attached to scope).: ");
+
           allBooks = books;
 
+          log(allBooks);
+          
           allBooks = _.map(allBooks, convertMessyTimestampToDate);
+
+          log("here’s allBooks with the timestamps cleand up: ");
+          log(allBooks);
 
           $scope.$apply(function () {
             $scope.books = allBooks;
-            updateFilterCriterion();
+            log("attached allBooks to scope");
           });
+            updateFilterCriterion();
+
         }
       };
       
@@ -103,8 +156,15 @@ angular.module('readingListApp', [])
       };
 
       function updateFilterCriterion() {
+        
+        log("updating filterCriterion");
+        
         $scope.filterCriterion = $scope.filterSliderValues[$scope.booksToShowSliderPosition]['code'];
-        $scope.$apply(function () { true; });
+        
+        log("filterCriterion is set. Updating scope.");
+
+        $scope.$apply(function () { log("scope is updated. hello from inside $scope.apply()!"); });
+
       };
 
       function filterBooksBy(criterion) {
@@ -118,7 +178,7 @@ angular.module('readingListApp', [])
           booksToShow = _(booksToShow)
             .filter(isAPossibleRead)
             .filter(function (book) {
-              var addedDate = new Date(book.Timestamp);
+              var addedDate = new Date(book.timestamp);
               return addedDate > sixMonthsAgo;
             }).value();
         } else if (criterion == 'lastTwenty') {
